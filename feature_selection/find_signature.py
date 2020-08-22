@@ -19,8 +19,9 @@ authors = pickle.load( open(authors_file, "r") )
 ### remainder go into training)
 ### feature matrices changed to dense representations for compatibility with
 ### classifier functions in versions 0.15.2 and earlier
-from sklearn import cross_validation
-features_train, features_test, labels_train, labels_test = cross_validation.train_test_split(word_data, authors, test_size=0.1, random_state=42)
+#from sklearn import cross_validation
+from sklearn.model_selection import train_test_split
+features_train, features_test, labels_train, labels_test = train_test_split(word_data, authors, test_size=0.1, random_state=42)
 
 from sklearn.feature_extraction.text import TfidfVectorizer
 vectorizer = TfidfVectorizer(sublinear_tf=True, max_df=0.5,
@@ -38,6 +39,28 @@ labels_train   = labels_train[:150]
 
 
 ### your code goes here
+from sklearn import tree
+clf = tree.DecisionTreeClassifier()
+clf = clf.fit(features_train, labels_train)
+
+pred = clf.predict(features_test)
+
+from sklearn.metrics import accuracy_score
+accuracy = accuracy_score(pred, labels_test)
+print('Accuracy: {}'.format(accuracy))
 
 
+#feature_importances_array = clf.feature_importances_
+#feature_mapping_array = vectorizer.get_feature_names()
+#for index, feature in enumerate(feature_importances_array):
+#	if feature > 0.05:
+#		print('Importance of most importance features: {}, Number: {}, Feature (Word): {}'.format(feature, index, feature_mapping_array[index]))
 
+
+feature_num = 0
+
+for importance in clf.feature_importances_:
+	if importance >= 0.05:
+		print feature_num, importance, vectorizer.get_feature_names()[feature_num]
+
+	feature_num += 1
